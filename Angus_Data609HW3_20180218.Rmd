@@ -1,0 +1,80 @@
+---
+title: "Data609HW3"
+author: "Angus Huang"
+date: "February 18, 2018"
+output: html_document
+---
+
+Page 113, Question 2
+
+![Page 79 Question 11](https://raw.githubusercontent.com/angus001/Data609/master/Data609Question2Page113.PNG)
+
+```{r}
+library(ggplot2)
+library(ggthemes)
+library(ggThemeAssist)
+library(latex2exp)
+library(knitr)
+```
+
+
+```{r}
+#Setting up the data table
+S <- c(5, seq(10, 100, 10))
+e <- c(0, 19, 57, 94, 134, 173, 216, 256, 297, 343, 390)
+mydf <- data.frame(S = S, e = e)
+
+```
+
+
+```{r}
+#caculate the slope
+c1 <- (mydf[5, 2] - mydf[4, 2])/(mydf[5, 1] - mydf[4, 1])
+c1
+```
+
+
+```{r}
+#plotting with slope from above
+g <- ggplot(mydf, aes(x = S, y = e)) + geom_point() + theme_wsj()
+g <- g + labs(title = "Elongation by Stress ")
+g <- g + labs(subtitle = "Estimation by 4th and 5th data points", 
+    x = TeX("Stress ($lb./in.^2$)"), y = "Elongation  (in./in.)")
+g <- g + theme (plot.subtitle = element_text(size = 16))
+g <- g + geom_abline(slope = c1)
+g
+```
+
+![Page 113 Question 2](https://raw.githubusercontent.com/angus001/Data609/master/Data609Question10Page126.PNG)
+
+```{r}
+#setting data frame
+body <- c("Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", 
+    "Jupiter")
+
+period   <- c(7.6 * 10^6, 1.94 * 10^7, 3.16 * 10^7, 5.94 * 10^7, 3.74 * 10^8, 9.35 * 10^8, 2.64 * 10^9, 5.22 * 10^9)
+
+distance <- c(5.79 * 10^10, 1.08 * 10^11, 1.5 * 10^11, 2.28 * 10^11, 7.79 * 10^11, 1.43 * 10^12, 2.87 * 10^12, 4.5 * 10^12)
+
+mydf2 <- data.frame(body = body, period = period, distance = distance)
+
+# print as table
+kable(mydf2)
+```
+```{r}
+lsmodel <- nls(distance~a*period^(3/2), data = mydf2, start = list(a=0.5))
+lsmodel
+```
+
+```{r}
+#plotting model using the results form nls model
+
+nlsfun <- function(x) 0.01320756 * x^(3/2)
+g2 <- ggplot(mydf2, aes(x = period, y = distance)) + geom_point() + theme_wsj()
+g2 <- g2 + labs(title = "Distance from sun vs. Planet Period")
+g2 <- g2 + labs(subtitle = TeX("Model: $y=0.01321x^{3/2}$"))
+g2 <- g2 + theme (plot.title = element_text(size = 18))
+g2 <- g2 + theme (plot.subtitle = element_text(size = 14))
+g2 <- g2 + stat_function(fun = nlsfun)
+g2
+```
